@@ -15,8 +15,6 @@ RUN set -x \
         apache2 \
         apache2-utils \
         apache2-proxy \
-        apache2-ssl \
-    && docker-run-bootstrap \
-    && docker-image-cleanup
+        apache2-ssl
 
 EXPOSE 80 443
