@@ -1,4 +1,4 @@
-FROM alpine:3.7
+FROM alpine:3.8
 
 ENV WEBAPP_ROOT=/app/www
 ENV LD_PRELOAD /usr/lib/preloadable_libiconv.so
