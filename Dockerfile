@@ -1,6 +1,6 @@
-FROM alpine:3.8
+FROM alpine:3.7
 
-ENV WEBAPP_ROOT=/app/www
+ENV WEBAPP_ROOT=www
 ENV LD_PRELOAD /usr/lib/preloadable_libiconv.so
 
 # Install gnu-libconv required by php5-iconv
@@ -14,7 +14,8 @@ RUN apk --update add apache2 php5-apache2 curl \
     && mkdir -p /opt/utils  
 
 EXPOSE 80 443
-
+RUN mkdir -p /app/www
+RUN ln -sfn /usr/bin/php5 /usr/bin/php
 ADD start.sh /opt/utils/
 
 RUN chmod +x /opt/utils/start.sh
