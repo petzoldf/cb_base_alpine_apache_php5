@@ -1,24 +1,22 @@
-FROM webdevops/php:alpine-php5
+FROM alpine:3.7
 
-ENV WEB_DOCUMENT_ROOT=/app/www \
-    WEB_DOCUMENT_INDEX=index.php \
-    WEB_ALIAS_DOMAIN=*.vm \
-    WEB_PHP_TIMEOUT=600 \
-    WEB_PHP_SOCKET=""
-ENV WEB_PHP_SOCKET=127.0.0.1:9000
+ENV WEBAPP_ROOT=/app/www
+ENV LD_PRELOAD /usr/lib/preloadable_libiconv.so
 
-COPY conf/ /opt/docker/
+# Install gnu-libconv required by php5-iconv
+RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing gnu-libiconv
 
-RUN set -x \
-    && apk-install \
-        apache2 \
-        apache2-utils \
-        apache2-proxy \
-        apache2-ssl \
-    && sed -ri ' \
-        s!^(\s*CustomLog)\s+\S+!\1 /proc/self/fd/1!g; \
-        s!^(\s*ErrorLog)\s+\S+!\1 /proc/self/fd/2!g; \
-        ' /etc/apache2/httpd.conf \
-    && docker-image-cleanup
+# Setup apache and php
+RUN apk --update add apache2 php5-apache2 curl \
+    php5-json php5-phar php5-openssl php5-mysql php5-curl php5-mcrypt php5-pdo_mysql php5-ctype php5-gd php5-xml php5-dom php5-iconv \
+    && rm -f /var/cache/apk/* \
+    && mkdir /run/apache2 \
+    && mkdir -p /opt/utils  
 
 EXPOSE 80 443
+
+ADD start.sh /opt/utils/
+
+RUN chmod +x /opt/utils/start.sh
+
+ENTRYPOINT ["/opt/utils/start.sh"]
